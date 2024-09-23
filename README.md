@@ -8,7 +8,7 @@ This repo hosts configuration files for my C++ projects. Aside from a `.clang-fo
 cmake_minimum_required ( VERSION 3.26 )
 
 # Use the script from releases to fetch everything
-include ( "${CMAKE_CURRENT_SOURCE_DIR}/get_cppinit.cmake" )
+include ( "${CMAKE_CURRENT_SOURCE_DIR}/get_cpp_init.cmake" )
 
 # Read git tags for version
 get_git_version ( PROJECT_VERSION_VARIABLE GIT_FULL_VERSION )
@@ -43,7 +43,7 @@ apply_compile_options ( ${PROJECT_NAME} )
 
 ## How to use
 
-You can either use `get_cppinit.cmake` script that is available on the Releases page, or you can add this repo as a subrepo or you can use CMake's FetchContent to get it (that's what the script does):
+You can either use `get_cpp_init.cmake` script that is available on the Releases page, or you can add this repo as a subrepo or you can use CMake's FetchContent to get it (that's what the script does):
 
 ```cmake
 cmake_minimum_required ( VERSION 3.26 )
@@ -52,7 +52,7 @@ include ( FetchContent )
 
 FetchContent_Declare (
 	cpp-init
-	GIT_REPOSITORY https://github.com/nerudaj/clang-format
+	GIT_REPOSITORY https://github.com/nerudaj/cpp-init
 )
 
 FetchContent_MakeAvailable( cpp-init )
