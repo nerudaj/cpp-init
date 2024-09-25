@@ -9,7 +9,7 @@ function ( fetch_cpp_init )
 
     FetchContent_MakeAvailable ( cpp-init )
 
-    set ( CPPINIT_FOLDER "${cppinit_SOURCE_DIR}" PARENT_SCOPE )
+    set ( CPPINIT_FOLDER "${cpp-init_SOURCE_DIR}" PARENT_SCOPE )
 endfunction ()
 
 fetch_cpp_init ()
