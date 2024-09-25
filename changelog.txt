@@ -1,0 +1,2 @@
+cpp-init v0.1 changelog:
+* Initial version
