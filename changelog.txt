@@ -1,2 +1,9 @@
+cpp-init v0.2 changelog:
+* Added enable_autoformatter which autocopies and link .clang-format
+	* Removed bootstrap_clang_format
+* Added enable_linter which autocopies and enables .clang-format
+	* But don't use it, C++23 is not compatible with that MSVC ships
+* fetch_prebuilt_dependency now uses FetchContent_MakeAvailable which replaces FetchContent_Populate
+
 cpp-init v0.1 changelog:
 * Initial version

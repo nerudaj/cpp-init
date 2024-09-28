@@ -29,19 +29,27 @@ function ( apply_compile_options TARGET )
 	endif ()
 endfunction ()
 
-function ( enable_autoformat_and_linter TARGET )
+function ( enable_autoformatter TARGET )
 	file ( COPY_FILE
 		"${CPPINIT_FOLDER}/.clang-format"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
 	)
 
+	target_sources ( ${TARGET} PRIVATE 
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
+	)
+
+	
+endfunction ()
+
+# NOTE: C++23 doesn't go well with .clang-tidy v17 currently installed in MSVC
+function ( enable_linter TARGET )
 	file ( COPY_FILE
 		"${CPPINIT_FOLDER}/.clang-tidy"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
 	)
 
 	target_sources ( ${TARGET} PRIVATE 
-		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
 	)
 

@@ -106,11 +106,7 @@ function ( fetch_prebuilt_dependency DEPNAME URL IS_HEADERONLY )
         )
     endif ()
 
-    FetchContent_GetProperties ( ${DEPNAME} )
-    if ( NOT "${${DEPNAME}_POPULATED}" )
-        FetchContent_Populate ( ${DEPNAME} )
-        set ( "${DEPNAME}_POPULATED" TRUE PARENT_SCOPE )
-    endif ()
+    FetchContent_MakeAvailable ( ${DEPNAME} )
 
     string ( TOLOWER ${DEPNAME} DEPNAME_LOWER )
     set ( "${DEPNAME}_FOLDER" "${${DEPNAME_LOWER}_SOURCE_DIR}" PARENT_SCOPE )
