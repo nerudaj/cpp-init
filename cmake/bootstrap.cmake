@@ -1,13 +1,3 @@
-# Copy .clang-format to the current source directory
-# so it can be added to a target as a source
-# which will automatically apply it in MSVC
-function ( bootstrap_clang_format )
-    file ( COPY_FILE
-        "${CPPINIT_FOLDER}/.clang-format"
-        "${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
-    )
-endfunction ()
-
 # Download and include CPM
 # Optionally specify a version to download (defaults to latest)
 function ( bootstrap_cpm )

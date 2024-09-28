@@ -22,6 +22,35 @@ function ( apply_compile_options TARGET )
 			${TARGET} PROPERTIES
 			DEBUG_POSTFIX "-d"
 		)
+		
+		
+	else ()
+		message ( "apply_compile_options: no options for non-msvc compiler" )
+	endif ()
+endfunction ()
+
+function ( enable_autoformat_and_linter TARGET )
+	file ( COPY_FILE
+		"${CPPINIT_FOLDER}/.clang-format"
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
+	)
+
+	file ( COPY_FILE
+		"${CPPINIT_FOLDER}/.clang-tidy"
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
+	)
+
+	target_sources ( ${TARGET} PRIVATE 
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
+	)
+
+	if ( ${MSVC} )
+		set_target_properties ( ${TARGET} PROPERTIES
+			VS_GLOBAL_RunCodeAnalysis true
+			VS_GLOBAL_EnableMicrosoftCodeAnalysis false
+			VS_GLOBAL_EnableClangTidyCodeAnalysis true
+		)
 	else ()
 		message ( "apply_compile_options: no options for non-msvc compiler" )
 	endif ()

@@ -20,8 +20,6 @@ project ( demo VERSION ${GIT_PROJECT_VERSION} )
 
 CPMAddPackage( "gh:nlohmann/json@3.11.2" )
 
-bootstrap_clang_format() # Copies .clang-format to CURRENT_SOURCE_DIR
-
 # globs all .hpp files from "${CMAKE_CURRENT_SOURCE_DIR}/include"
 # and all .cpp files from "${CMAKE_CURRENT_SOURCE_DIR}/src"
 # including subfolders
@@ -30,7 +28,6 @@ glob_headers_sources ( HEADERS SOURCES )
 add_executable ( ${PROJECT_NAME}
 	${HEADERS}
 	${SOURCES}
-	${CMAKE_CURRENT_SOURCE_DIR}/.clang-format
 )
 
 target_link_libraries ( ${PROJECT_NAME}
@@ -38,7 +35,10 @@ target_link_libraries ( ${PROJECT_NAME}
 )
 
 # Applies compiler switches and options I commonly use
-apply_compile_options ( ${PROJECT_NAME} ) 
+apply_compile_options ( ${PROJECT_NAME} )
+
+# Applies .clang-format and .clang-tidy
+enable_autoformat_and_linter ( ${PROJECT_NAME} )
 ```
 
 ## How to use
@@ -135,3 +135,25 @@ fetch_prebuilt_dependency (
 
 # unpacked archive contents are in ${SFML_FOLDER}
 ```
+
+## cpp.cmake
+
+### apply_compile_options
+
+**NOTE:** Currently only supported with MSVC generator.
+
+Applies set of useful compiler diagnostics and settings.
+
+```cmake
+apply_compile_options ( ${TARGET} )
+```
+
+### enable_autoformat_and_linter
+
+Copies `.clang-format` and `.clang-tidy` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources.
+
+```cmake
+enable_autoformat_and_linter ( ${TARGET} )
+```
+
+That's enough to turn on clang format in MSVC. For clang tidy, it also enables code analysis with clang-tidy in MSVC and the rest of the configuration is handled by the config file.
