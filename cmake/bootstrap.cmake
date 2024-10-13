@@ -86,28 +86,80 @@ endfunction ()
 
 include ( FetchContent )
 
-# Use FetchContent to download a dependency from a URL
-# If IS_HEADERONLY is TRUE then the file will just be downloaded
-# otherwise the file will be extracted
-# You can test ${DEPNAME}_POPULATED to see if download was successful
-# The dependency is downloaded (and possibly extracted) into
-# ${DEPNAME}_FOLDER
-function ( fetch_prebuilt_dependency DEPNAME URL IS_HEADERONLY )
-    if ( ${IS_HEADERONLY} )
-        FetchContent_Declare ( ${DEPNAME}
-            URL ${URL}
-            DOWNLOAD_NO_PROGRESS TRUE
-            DOWNLOAD_NO_EXTRACT TRUE
-        )
-    else ()
-        FetchContent_Declare ( ${DEPNAME}
-            URL ${URL}
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-        )
-    endif ()
-
+function ( __fetch_common DEPNAME )
     FetchContent_MakeAvailable ( ${DEPNAME} )
 
     string ( TOLOWER ${DEPNAME} DEPNAME_LOWER )
-    set ( "${DEPNAME}_FOLDER" "${${DEPNAME_LOWER}_SOURCE_DIR}" PARENT_SCOPE )
+    set ( "${DEPNAME}_FOLDER" "${${DEPNAME_LOWER}_SOURCE_DIR}" )
+    
+    return ( PROPAGATE "${DEPNAME}_FOLDER" )
+endfunction ()
+
+# Function: fetch_prebuilt_dependency
+# Description: Fetches a prebuilt dependency from a specified URL.
+# Arguments:
+#   DEPNAME    - Name of the dependency.
+# Options:
+#   URL        - The URL from which to fetch the dependency. This parameter is mandatory.
+#   CACHE_DIR  - The directory where the dependency will be cached. Defaults to "${PROJECT_BINARY_DIR}/_deps" if not specified.
+# Example:
+#   fetch_prebuilt_dependency(MyDependency URL "http://example.com/mydependency.zip")
+#   fetch_prebuilt_dependency(MyDependency URL "http://example.com/mydependency.zip" CACHE_DIR "/path/to/cache")
+function ( fetch_prebuilt_dependency DEPNAME )
+    set ( oneValueArgs URL CACHE_DIR )
+    
+    cmake_parse_arguments( FHD "" "${oneValueArgs}" "" ${ARGN} )
+
+    if ( NOT FHD_URL )
+        message ( FATAL_ERROR "URL must be specified!" )
+    endif ()
+    
+    set ( CACHE_DIR "${PROJECT_BINARY_DIR}/_deps" )
+    if ( FHD_CACHE_DIR )
+        set ( CACHE_DIR "${FHD_CACHE_DIR}" )
+        message ( "Setting cache dir to: ${CACHE_DIR}" )
+    endif()
+
+    FetchContent_Declare ( ${DEPNAME}
+        URL ${URL}
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        PREFIX "${CACHE_DIR}"
+    )
+
+    __fetch_common ( ${DEPNAME} )
+    return ( PROPAGATE "${DEPNAME}_FOLDER" )
+endfunction ()
+
+# Function: fetch_headeronly_dependency
+# Description: This function fetches a header-only dependency from a specified URL.
+# Parameters:
+#   DEPNAME    - Name of the dependency.
+# Options:
+#   URL        - The URL from which to fetch the dependency. This parameter is mandatory.
+#   CACHE_DIR  - The directory where the dependency will be cached. If not specified, defaults to "${PROJECT_BINARY_DIR}/_deps".
+# Example:
+#   fetch_headeronly_dependency(MyDependency URL "http://example.com/mydependency.zip")
+function ( fetch_headeronly_dependency DEPNAME )
+    set ( oneValueArgs URL CACHE_DIR )
+    
+    cmake_parse_arguments( FHD "" "${oneValueArgs}" "" ${ARGN} )
+
+    if ( NOT FHD_URL )
+        message ( FATAL_ERROR "URL must be specified!" )
+    endif ()
+    
+    set ( CACHE_DIR "${PROJECT_BINARY_DIR}/_deps" )
+    if ( FHD_CACHE_DIR )
+        set ( CACHE_DIR "${FHD_CACHE_DIR}" )
+        message ( "Setting cache dir to: ${CACHE_DIR}" )
+    endif()
+
+    FetchContent_Declare ( ${DEPNAME}
+        URL ${FHD_URL}
+        DOWNLOAD_NO_PROGRESS TRUE
+        DOWNLOAD_NO_EXTRACT TRUE
+        PREFIX "${CACHE_DIR}"
+    )
+
+    __fetch_common ( ${DEPNAME} )
 endfunction ()
