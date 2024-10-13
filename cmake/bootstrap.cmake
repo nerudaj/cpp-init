@@ -1,5 +1,10 @@
-# Download and include CPM
-# Optionally specify a version to download (defaults to latest)
+# Function: bootstrap_cpm
+# Description: Bootstraps the CPM package manager by downloading and including the specified version of the CPM.cmake script.
+# Arguments:
+#   VERSION - The version of CPM to download. Defaults to "latest".
+# Example:
+#   bootstrap_cpm()
+#   bootstrap_cpm(VERSION "v0.34.0")
 function ( bootstrap_cpm )
     set ( oneValueArgs VERSION )
 
@@ -18,9 +23,13 @@ function ( bootstrap_cpm )
     include ( "${CMAKE_CURRENT_BINARY_DIR}/get_cpm.cmake" )
 endfunction ()
 
-# For the current source directory
-# glob all .hpp files in the include subfolder into variable with name specified in HEADERS_OUTVARNAME
-# glob all .cpp files in the src subfolder into variable with name specified in SOURCES_OUTVARNAME}
+# Function: glob_headers_and_sources
+# Description: Recursively globs header and source files, organizes them into source groups, and sets the output variables with the discovered files.
+# Arguments:
+#   HEADERS_OUTVARNAME - Variable to store the list of discovered header files.
+#   SOURCES_OUTVARNAME - Variable to store the list of discovered source files.
+# Example:
+#   glob_headers_and_sources(my_headers my_sources)
 function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
     file ( GLOB_RECURSE
         LOCAL_HEADERS
@@ -51,11 +60,16 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
     set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES}" PARENT_SCOPE )
 endfunction ()
 
-# Examines current git tag
-# Stores inferred version into variable with name specified in OUTVAR_PROJECT_VERSION
-# - this one can be used in project ( VERSION ) parameter
-# The full version (including commit hash) is stored in variable with name specified
-# in OUTVAR_FULL_VERSION
+# Function: get_git_version
+# Description: Retrieves the current git version using `git describe --tags` and sets the specified project version variables.
+# Arguments:
+#   PROJECT_VERSION_VARIABLE - Variable to store the inferred project version.
+#   FULL_VERSION_VARIABLE    - Variable to store the full git version.
+# Additional Information:
+#   The version string is retrieved using the `git describe --tags` command, which extracts the latest annotated tag from the git history.
+#   The tags should follow the Semantic Versioning (semver) format, with an optional 'v' prefix. For example, 'v1.0.0' or '1.0.0'.
+# Example:
+#   get_git_version(PROJECT_VERSION_VARIABLE my_project_version FULL_VERSION_VARIABLE my_full_version)
 function ( get_git_version )
     set ( oneValueArgs PROJECT_VERSION_VARIABLE FULL_VERSION_VARIABLE )
 
@@ -162,4 +176,5 @@ function ( fetch_headeronly_dependency DEPNAME )
     )
 
     __fetch_common ( ${DEPNAME} )
+    return ( PROPAGATE "${DEPNAME}_FOLDER" )
 endfunction ()

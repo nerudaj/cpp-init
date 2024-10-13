@@ -15,6 +15,7 @@ function ( apply_compile_options TARGET )
 			/we4458 # Name shadowing
 			/we4459 # Name shadowing
 			# /wd4251
+			/we4369 # value of enum overflows underlying type
 			/we5205 # Dtor on iface is not virtual
 		)
 		
@@ -31,21 +32,19 @@ endfunction ()
 
 function ( enable_autoformatter TARGET )
 	file ( COPY_FILE
-		"${CPPINIT_FOLDER}/.clang-format"
+		"${CLANG_TIDY_PATH}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
 	)
 
 	target_sources ( ${TARGET} PRIVATE 
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
 	)
-
-	
 endfunction ()
 
 # NOTE: C++23 doesn't go well with .clang-tidy v17 currently installed in MSVC
 function ( enable_linter TARGET )
 	file ( COPY_FILE
-		"${CPPINIT_FOLDER}/.clang-tidy"
+		"${CLANG_TIDY_PATH}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
 	)
 

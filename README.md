@@ -120,20 +120,25 @@ CPM is great, but you pay with long build times. Many libraries on GitHub come p
 
 ```cmake
 fetch_prebuilt_dependency (
-	NLOHMANN_JSON 
-	https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
-	TRUE # IS_HEADERONLY
-)
-
-# json.hpp is located in ${NLOHMANN_JSON_FOLDER}
-
-fetch_prebuilt_dependency (
 	SFML
-	https://github.com/SFML/SFML/releases/download/2.6.1/SFML-2.6.1-windows-vc17-64-bit.zip
-	FALSE # Not headeronly, zip will be automatically unpacked
+	URL https://github.com/SFML/SFML/releases/download/2.6.1/SFML-2.6.1-windows-vc17-64-bit.zip
+	CACHE_DIR "C:/deps" # can download to outside location
 )
 
 # unpacked archive contents are in ${SFML_FOLDER}
+```
+
+### fetch_headeronly_dependency
+
+For headeronly libraries, it is even easier (the `CACHE_DIR` parameter can still be used).
+
+```cmake
+fetch_headeronly_dependency (
+	NLOHMANN_JSON 
+	URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
+)
+
+# json.hpp is located in ${NLOHMANN_JSON_FOLDER}
 ```
 
 ## cpp.cmake
