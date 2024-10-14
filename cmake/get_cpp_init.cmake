@@ -27,6 +27,10 @@ function ( fetch_cpp_init )
             "${cpp-init_SOURCE_DIR}/cmake/bootstrap.cmake"
             "${CPPINIT_FOLDER}/bootstrap.cmake"
         )
+        file ( COPY_FILE
+            "${cpp-init_SOURCE_DIR}/cmake/macros.cmake"
+            "${CPPINIT_FOLDER}/macros.cmake"
+        )
     else ()
         set( CPPINIT_FOLDER "${cpp-init_SOURCE_DIR}/cmake" )
     endif ()
@@ -41,3 +45,4 @@ fetch_cpp_init ( SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
 
 include ( "${CPPINIT_FOLDER}/cpp.cmake" )
 include ( "${CPPINIT_FOLDER}/bootstrap.cmake" )
+include ( "${CPPINIT_FOLDER}/macros.cmake" )
