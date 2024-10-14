@@ -23,7 +23,7 @@ CPMAddPackage( "gh:nlohmann/json@3.11.2" )
 # globs all .hpp files from "${CMAKE_CURRENT_SOURCE_DIR}/include"
 # and all .cpp files from "${CMAKE_CURRENT_SOURCE_DIR}/src"
 # including subfolders
-glob_headers_sources ( HEADERS SOURCES ) 
+glob_headers_and_sources ( HEADERS SOURCES ) 
 
 add_executable ( ${PROJECT_NAME}
 	${HEADERS}
@@ -81,12 +81,12 @@ bootstrap_cpm ( 0.30.2 ) # version number is optional
 CPMAddPackage( "gh:nlohmann/json@3.11.2" )
 ```
 
-### glob_headers_sources
+### glob_headers_and_sources
 
 If the `${CMAKE_CURRENT_SOURCE_DIR}` contains subfolders `include` and `src`, this will recursively glob all `.hpp` files in the `include` folder and all `.cpp` files in the `src` folder. It will add them to your IDE filters through `source_group` call and it will populate the output variables.
 
 ```cmake
-glob_headers_sources ( HEADER_FILES SOURCE_FILES )
+glob_headers_and_sources ( HEADER_FILES SOURCE_FILES )
 
 add_executable ( mytarget
 	${HEADER_FILES}
