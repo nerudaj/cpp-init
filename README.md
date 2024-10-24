@@ -1,8 +1,10 @@
 # cpp-init
 
-This repo hosts configuration files for my C++ projects. Aside from a `.clang-format` file, there is a bunch of CMake scripts for easy setup and maintenance of my projects.
+This repo hosts configuration files for my C++ projects. In addition to `.clang-format`/`.clang-tidy` files, several CMake scripts exist for easy project setup and maintenance.
 
 ## Quickstart example
+
+First, get the `get_cpp_init.cmake` script from the Releases page. Then you can include it in your project and it will fetch the rest of the scripts for you:
 
 ```cmake
 cmake_minimum_required ( VERSION 3.26 )
@@ -37,31 +39,8 @@ target_link_libraries ( ${PROJECT_NAME}
 # Applies compiler switches and options I commonly use
 apply_compile_options ( ${PROJECT_NAME} )
 
-# Applies .clang-format and .clang-tidy
-enable_autoformat_and_linter ( ${PROJECT_NAME} )
-```
-
-## How to use
-
-You can either use `get_cpp_init.cmake` script that is available on the Releases page, or you can add this repo as a subrepo or you can use CMake's FetchContent to get it (that's what the script does):
-
-```cmake
-cmake_minimum_required ( VERSION 3.26 )
-
-include ( FetchContent )
-
-FetchContent_Declare (
-	cpp-init
-	GIT_REPOSITORY https://github.com/nerudaj/cpp-init
-)
-
-FetchContent_MakeAvailable( cpp-init )
-
-# Make utility functions available
-include ( "${cppinit_folder}/cmake/bootstrap.cmake" )
-
-# Set up C++ standard, compiler flags, etc
-include ( "${cppinit_folder}/cmake/cpp.cmake" )
+# Applies .clang-format
+enable_autoformatter ( ${PROJECT_NAME} )
 ```
 
 ## bootstrap.cmake
@@ -70,7 +49,7 @@ This is a script full of useful utility functions:
 
 ### bootstrap_cpm
 
-Downloads `CPM.cmake` and includes it. You can specify a particular version or stick with latest:
+Downloads `CPM.cmake` and includes it. You can specify a particular version or stick with the latest:
 
 ```cmake
 include ( "${cppinit_folder}/cmake/bootstrap.cmake" )
@@ -98,7 +77,7 @@ Just know that newly added files will be automatically found on subsequent build
 
 ### get_git_version
 
-Reads the current git version for use in project declarations and packaing.
+Reads the current git version for use in project declarations and packaging.
 
 ```cmake
 get_git_version (
@@ -109,7 +88,7 @@ get_git_version (
 # GIT_PROJECT_VERSION is <number>.<number>.<number>
 project ( demo VERSION ${GIT_PROJECT_VERSION} )
 
-# FULL_PROJECT_VERSION is the full output of `git describe` including number of commits since last tag and current commit hash
+# FULL_PROJECT_VERSION is the full output of `git describe` including the number of commits since the last tag and the current commit hash
 ```
 
 The version is read from git tags using `git describe`. Tagname is allowed to be prefixed with `v`. This prefix will be stripped from the short project version.
@@ -147,18 +126,25 @@ fetch_headeronly_dependency (
 
 **NOTE:** Currently only supported with MSVC generator.
 
-Applies set of useful compiler diagnostics and settings.
+Applies a set of useful compiler diagnostics and settings.
 
 ```cmake
 apply_compile_options ( ${TARGET} )
 ```
 
-### enable_autoformat_and_linter
+### enable_autoformatter
 
-Copies `.clang-format` and `.clang-tidy` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources.
+Copies `.clang-format` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources. In MSVC, you can press Alt F+K to format your code or install Format on Save extension.
 
 ```cmake
-enable_autoformat_and_linter ( ${TARGET} )
+enable_autoformatter ( ${TARGET} )
 ```
 
-That's enough to turn on clang format in MSVC. For clang tidy, it also enables code analysis with clang-tidy in MSVC and the rest of the configuration is handled by the config file.
+### enable_linter
+
+Copies `.clang-tidy` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources. For MSVC, it turns on static code analysis with Clang tidy.
+
+```cmake
+enable_linter ( ${TARGET} )
+```
+
