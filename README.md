@@ -43,6 +43,27 @@ apply_compile_options ( ${PROJECT_NAME} )
 enable_autoformatter ( ${PROJECT_NAME} )
 ```
 
+With macros, this can get even shorter:
+
+```cmake
+cmake_minimum_required ( VERSION 3.26 )
+
+# Use the script from releases to fetch everything
+include ( "${CMAKE_CURRENT_SOURCE_DIR}/get_cpp_init.cmake" )
+
+# Read git tags for version
+get_git_version ( PROJECT_VERSION_VARIABLE GIT_FULL_VERSION )
+
+# Enable dependency management with CPM
+bootstrap_cpm()
+
+project ( demo VERSION ${GIT_PROJECT_VERSION} )
+
+CPMAddPackage( "gh:nlohmann/json@3.11.2" )
+
+make_executable ( ${PROJECT_NAME} DEPS nlohmann::json )
+```
+
 ## bootstrap.cmake
 
 This is a script full of useful utility functions:
