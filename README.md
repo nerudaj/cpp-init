@@ -61,6 +61,8 @@ project ( demo VERSION ${GIT_PROJECT_VERSION} )
 
 CPMAddPackage( "gh:nlohmann/json@3.11.2" )
 
+# Assumes there is at least `src` directory in the current one (also looks for `include`)
+# It globs them, adds them as sources, enables autoformatter and applies compile options.
 make_executable ( ${PROJECT_NAME} DEPS nlohmann::json )
 ```
 
