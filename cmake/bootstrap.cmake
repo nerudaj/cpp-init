@@ -135,7 +135,7 @@ function ( fetch_prebuilt_dependency DEPNAME )
     endif()
 
     FetchContent_Declare ( ${DEPNAME}
-        URL ${URL}
+        URL "${FHD_URL}"
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         PREFIX "${CACHE_DIR}"
     )
@@ -169,7 +169,7 @@ function ( fetch_headeronly_dependency DEPNAME )
     endif()
 
     FetchContent_Declare ( ${DEPNAME}
-        URL ${FHD_URL}
+        URL "${FHD_URL}"
         DOWNLOAD_NO_PROGRESS TRUE
         DOWNLOAD_NO_EXTRACT TRUE
         PREFIX "${CACHE_DIR}"
