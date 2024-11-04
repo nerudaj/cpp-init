@@ -9,7 +9,7 @@ fetch_headeronly_dependency (
 
 fetch_prebuilt_dependency (
     DGM
-    URL "https://github.com/nerudaj/fsm-lib/releases/download/v2.1.0/fsm-lib-v2.1.0-Windows-MSVC-x64.zipXX"
+    URL "https://github.com/nerudaj/fsm-lib/releases/download/v2.1.0/fsm-lib-v2.1.0-Windows-MSVC-x64.zip"
 )
 
 project ( demo LANGUAGES CXX )
