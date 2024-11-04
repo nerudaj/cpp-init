@@ -11,7 +11,7 @@ jobs:
     core:
         runs-on: windows-2022
         steps:
-        - uses: actions/checkout@4
+        - uses: actions/checkout@v4
         
         - name: Setup cmake
           uses: jwlawson/actions-setup-cmake@v2
@@ -35,7 +35,7 @@ jobs:
     fetch:
         runs-on: windows-2022
         steps:
-        - uses: actions/checkout@4
+        - uses: actions/checkout@v4
         
         - name: Setup cmake
           uses: jwlawson/actions-setup-cmake@v2
