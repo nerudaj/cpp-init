@@ -41,7 +41,9 @@ function ( fetch_cpp_init )
     return( PROPAGATE CPPINIT_FOLDER )
 endfunction()
 
-fetch_cpp_init ( SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+# set ( CPP_INIT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+
+fetch_cpp_init ( SCRIPT_DIR "${CPP_INIT_ROOT_DIR}" )
 
 include ( "${CPPINIT_FOLDER}/cpp.cmake" )
 include ( "${CPPINIT_FOLDER}/bootstrap.cmake" )
