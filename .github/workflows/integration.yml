@@ -8,7 +8,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    core:
+    configure_and_build:
         runs-on: windows-2022
         steps:
         - uses: actions/checkout@v4
@@ -32,8 +32,11 @@ jobs:
             cmake --build . --config Debug
           shell: cmd
 
-    fetch:
+    just_configure:
         runs-on: windows-2022
+        strategy:
+          matrix:
+            folder: [ fetch_test, root_dir_test ]
         steps:
         - uses: actions/checkout@v4
         
@@ -43,7 +46,7 @@ jobs:
             cmake-version: '3.26.1'
         
         - name: Configure
-          working-directory: ${{github.workspace}}/fetch_test
+          working-directory: ${{github.workspace}}/${{matrix.folder}}
           run: |
             mkdir _build
             cd _build

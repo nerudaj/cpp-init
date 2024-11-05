@@ -10,7 +10,7 @@ First, get the `get_cpp_init.cmake` script from the Releases page. Then you can 
 cmake_minimum_required ( VERSION 3.26 )
 
 # Use the script from releases to fetch everything
-include ( "${CMAKE_CURRENT_SOURCE_DIR}/get_cpp_init.cmake" )
+include ( "${PATH_TO}/get_cpp_init.cmake" )
 
 # Read git tags for version
 get_git_version ( PROJECT_VERSION_VARIABLE GIT_FULL_VERSION )
@@ -49,7 +49,7 @@ With macros, this can get even shorter:
 cmake_minimum_required ( VERSION 3.26 )
 
 # Use the script from releases to fetch everything
-include ( "${CMAKE_CURRENT_SOURCE_DIR}/get_cpp_init.cmake" )
+include ( "${PATH_TO}/get_cpp_init.cmake" )
 
 # Read git tags for version
 get_git_version ( PROJECT_VERSION_VARIABLE GIT_FULL_VERSION )
@@ -65,6 +65,8 @@ CPMAddPackage( "gh:nlohmann/json@3.11.2" )
 # It globs them, adds them as sources, enables autoformatter and applies compile options.
 make_executable ( ${PROJECT_NAME} DEPS nlohmann::json )
 ```
+
+Assuming you're placing all `.cmake` files into a `cmake` subfolder, you can set a variable `CPP_INIT_ROOT_DIR` to `${CMAKE_CURRENT_SOURCE_DIR}/cmake` prior to including `get_cpp_init.cmake`. This will copy all related CMake scripts into your `cmake` folder so you can add them to your version control.
 
 ## bootstrap.cmake
 
