@@ -173,3 +173,25 @@ Copies `.clang-tidy` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the speci
 enable_linter ( ${TARGET} )
 ```
 
+## macros.cmake
+
+### make_static_library
+
+A shorthand for calling `glob_headers_and_sources`, `apply_compile_options` and bunch of other options. Declares `include` folder as public include directory.
+
+Optionally you can specify a list of dependencies for public linkage.
+
+```cmake
+make_static_library ( myLib DEPS nlohmann_json::nlohmann_json )
+
+# globs include/src folders
+# applies compile options
+# declares include folder as public include dir
+# links nlohmann
+# enables autoformatter
+# ...
+```
+
+### make_executable
+
+Similar as `make_static_library`, just for executables.

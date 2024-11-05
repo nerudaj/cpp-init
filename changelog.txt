@@ -5,7 +5,11 @@ cpp-init v0.3 changelog:
     * Both now have URL as a named parameter
     * Both now have CACHE_DIR as a named parameter for downloading the dependencies outside of project dir
 * Updated documentation
-* fetch_cpp_init can be given a folder to download cpp.cmake and bootstrap.cmake into
+* User can set CPP_INIT_ROOT_DIR to which all scripts will be downloaded
+* Added macros.cmake with following two macros
+    * make_static_library
+    * make_executable
+    * These are shorthands for other functions that I often use together
 
 cpp-init v0.2 changelog:
 * Added enable_autoformatter which autocopies and link .clang-format
