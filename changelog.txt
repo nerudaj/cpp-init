@@ -1,5 +1,6 @@
 cpp-init v0.4 changelog:
 * Fixed a bug where `enable_autoformatter` was installing .clang-tidy instead of .clang-format
+* Fixed a bug where `make_executable` failed with "source file not found" by not adding header files to target
 
 cpp-init v0.3 changelog:
 * Split fetch_prebuilt_dependency into two functions
