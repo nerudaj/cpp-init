@@ -32,7 +32,7 @@ endfunction ()
 
 function ( enable_autoformatter TARGET )
 	file ( COPY_FILE
-		"${CLANG_TIDY_PATH}"
+		"${CLANG_FORMAT_PATH}"
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
 	)
 
