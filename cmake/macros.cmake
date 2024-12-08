@@ -28,7 +28,7 @@ macro ( make_executable TARGET )
 
     glob_headers_and_sources ( HEADERS SOURCES )
 
-    add_executable( ${TARGET} ${SOURCES} )
+    add_executable( ${TARGET} ${HEADERS} ${SOURCES} )
 
     if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
         target_include_directories( ${TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
