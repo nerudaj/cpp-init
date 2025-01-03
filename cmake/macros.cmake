@@ -47,7 +47,7 @@ macro ( cpm_add_base64 )
 endmacro ()
 
 macro ( cpm_add_catch2 )
-    CPMAddPackage("gh:catchorg/Catch2#3.7.1")
+    CPMAddPackage("gh:catchorg/Catch2#v3.7.1")
 endmacro ()
 
 macro ( cpm_add_cxxopts )
