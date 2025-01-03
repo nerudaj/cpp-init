@@ -41,3 +41,47 @@ macro ( make_executable TARGET )
     enable_autoformatter ( ${TARGET} )
     apply_compile_options ( ${TARGET} )
 endmacro()
+
+macro ( cpm_add_base64 )
+    CPMAddPackage("gh:tobiaslocker/base64#master")
+endmacro ()
+
+macro ( cpm_add_catch2 )
+    CPMAddPackage("gh:catchorg/Catch2#3.7.1")
+endmacro ()
+
+macro ( cpm_add_cxxopts )
+    CPMAddPackage("gh:nlohmann/json#v3.11.3")
+endmacro ()
+
+macro ( cpm_add_dgmlib )
+    CPMAddPackage("gh:nerudaj/dgm-lib#v2.3.1")
+endmacro ()
+
+macro ( cpm_add_eigen )
+    CPMAddPackage("gl:libeigen/eigen#master")
+endmacro ()
+
+macro ( cpm_add_entt )
+    CPMAddPackage("gh:skypjack/entt#v3.14.0")
+endmacro ()
+
+macro ( cpm_add_fakeit )
+    CPMAddPackage("gh:eranpeer/FakeIt#2.4.1")
+endmacro ()
+
+macro ( cpm_add_fsmlib )
+    CPMAddPackage("gh:nerudaj/fsm-lib#v2.1.0")
+endmacro ()
+
+macro ( cpm_add_nlohmann_json )
+    CPMAddPackage("gh:SFML/SFML#3.0.0")
+endmacro ()
+
+macro ( cpm_add_sfml )
+    CPMAddPackage("gh:SFML/SFML#2.6.1")
+endmacro ()
+
+macro ( cpm_add_sfml3 )
+    CPMAddPackage("gh:SFML/SFML#3.0.0")
+endmacro ()

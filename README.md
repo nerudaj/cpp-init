@@ -2,6 +2,24 @@
 
 This repo hosts configuration files for my C++ projects. In addition to `.clang-format`/`.clang-tidy` files, several CMake scripts exist for easy project setup and maintenance.
 
+# Table of Contents
+
+ - [Quickstart example](#quickstart-example)
+ - [CPM Packages](#cpm-packages)
+ - [bootstrap.cmake](#bootstrapcmake)
+   - [bootstrap_cpm](#bootstrap_cpm)
+   - [glob_headers_and_sources](#glob_headers_and_sources)
+   - [get_git_version](#get_git_version)
+   - [fetch_prebuilt_dependency](#fetch_prebuilt_dependency)
+   - [fetch_headeronly_dependency](#fetch_headeronly_dependency)
+ - [cpp.cmake](#cppcmake)
+   - [apply_compile_options](#apply_compile_options)
+   - [enable_autoformatter](#enable_autoformatter)
+   - [enable_linter](#enable_linter)
+ - [macros.cmake](#macroscmake)
+   - [make_static_library](#make_static_library)
+   - [make_executable](#make_executable)
+
 ## Quickstart example
 
 First, get the `get_cpp_init.cmake` script from the Releases page. Then you can include it in your project and it will fetch the rest of the scripts for you:
@@ -59,7 +77,8 @@ bootstrap_cpm()
 
 project ( demo VERSION ${GIT_PROJECT_VERSION} )
 
-CPMAddPackage( "gh:nlohmann/json@3.11.2" )
+# Convenience macro for CPMAddPackage call
+cpm_add_nlohmann_json ()
 
 # Assumes there is at least `src` directory in the current one (also looks for `include`)
 # It globs them, adds them as sources, enables autoformatter and applies compile options.
@@ -67,6 +86,24 @@ make_executable ( ${PROJECT_NAME} DEPS nlohmann::json )
 ```
 
 Assuming you're placing all `.cmake` files into a `cmake` subfolder, you can set a variable `CPP_INIT_ROOT_DIR` to `${CMAKE_CURRENT_SOURCE_DIR}/cmake` prior to including `get_cpp_init.cmake`. This will copy all related CMake scripts into your `cmake` folder so you can add them to your version control.
+
+## CPM Packages
+
+There are a few macros that make it easier to add certain well known (well known to me) C++ packages. Here's an overview:
+
+| Library name | Version | Macro | Linkable target |
+| --- | --- | --- | --- |
+| base64 | master | cpm_add_base64 | base64 |
+| Catch2 | 3.7.1 | cpm_add_catch2 | Catch2::Catch2 |
+| cxxopts | 3.11.3 | cpm_add_cxxopts | cxxopts |
+| dgm-lib | 2.3.1 | cpm_add_dgmlib | dgm-lib |
+| Eigen | master | cpm_add_eigen | Eigen3::Eigen |
+| EnTT | 3.14.0 | cpm_add_entt | EnTT::EnTT |
+| FakeIt | 2.4.1 | cpm_add_fakeit | FakeIt::FakeIt |
+| fsm-lib | 2.1.0 | cpm_add_fsmlib | fsm-lib |
+| nlohmann json | 3.0.0 | cpm_add_nlohmann_json | nlohmann::json |
+| SFML | 2.6.1 | cpm_add_sfml | sfml-main sfml-audio sfml-graphics sfml-window sfml-network |
+| SFML 3 | 3.0.0 | cpm_add_sfml3 | SFML::Main SFML::Audio SFML::Graphics SFML::Window SFML::Network |
 
 ## bootstrap.cmake
 

@@ -36,7 +36,7 @@ jobs:
         runs-on: windows-2022
         strategy:
           matrix:
-            folder: [ fetch_test, root_dir_test ]
+            folder: [ fetch_test, root_dir_test, packages_test ]
         steps:
         - uses: actions/checkout@v4
         
