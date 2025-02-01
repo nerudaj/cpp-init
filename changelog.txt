@@ -1,4 +1,5 @@
 cpp-init v0.5 changelog:
+* Private headers are allowed by placing them into `private_include` folder
 * `source` folder is allowed instead of `src`
 
 cpp-init v0.4 changelog:

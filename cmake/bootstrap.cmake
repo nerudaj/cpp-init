@@ -40,6 +40,16 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
 		LOCAL_HEADERS2
         "${CMAKE_CURRENT_SOURCE_DIR}/include**/*.h"
 	)
+    
+    file ( GLOB_RECURSE
+        PRIVATE_HEADERS
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/.hpp"
+    )
+    
+    file ( GLOB_RECURSE
+        PRIVATE_HEADERS2
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/.hpp"
+    )
 
     file ( GLOB_RECURSE
         LOCAL_SOURCES
@@ -55,14 +65,18 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
         FILES ${LOCAL_HEADERS} ${LOCAL_HEADERS2}
     )
+    
+    source_group(
+        TREE "${CMAKE_CURRENT_SOURCE_DIR}"
+        FILES ${PRIVATE_HEADERS} ${PRIVATE_HEADERS2}
+    )
 
     source_group(
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
         FILES ${LOCAL_SOURCES} ${LOCAL_SOURCES2}
     )
 
-    set ( ${HEADERS_OUTVARNAME} "${LOCAL_HEADERS};${LOCAL_HEADERS2}" PARENT_SCOPE )
-    set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES}" PARENT_SCOPE )
+    set ( ${HEADERS_OUTVARNAME} "${LOCAL_HEADERS};${LOCAL_HEADERS2};${PRIVATE_HEADERS};${PRIVATE_HEADERS2}" PARENT_SCOPE )
     set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES};${LOCAL_SOURCES2}" PARENT_SCOPE )
 endfunction ()
 

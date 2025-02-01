@@ -1,3 +1,15 @@
+macro ( link_public_header_folder TARGET )
+    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        target_include_directories( ${TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+    endif ()
+endmacro ()
+
+macro ( link_private_header_folder TARGET )
+    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/private_include")
+        target_include_directories( ${TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private_include" )
+    endif ()
+endmacro ()
+
 macro ( make_static_library TARGET )
     set( options )
     set( multiValueArgs DEPS )
@@ -8,9 +20,8 @@ macro ( make_static_library TARGET )
 
     add_library( ${TARGET} STATIC ${HEADERS} ${SOURCES} )
 
-    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-        target_include_directories( ${TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
-    endif ()
+    link_public_header_folder ( ${TARGET} )
+    link_private_header_folder ( ${TARGET} )
 
     if ( CIMSL_DEPS )
         target_link_libraries ( ${TARGET} PUBLIC ${CIMSL_DEPS} )
@@ -30,9 +41,8 @@ macro ( make_executable TARGET )
 
     add_executable( ${TARGET} ${HEADERS} ${SOURCES} )
 
-    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
-        target_include_directories( ${TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
-    endif ()
+    link_public_header_folder ( ${TARGET} )
+    link_private_header_folder ( ${TARGET} )
 
     if ( CIME_DEPS )
         target_link_libraries ( ${TARGET} PUBLIC ${CIME_DEPS} )
