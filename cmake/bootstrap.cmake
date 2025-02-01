@@ -45,6 +45,11 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
         LOCAL_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src**/*.cpp"
     )
+    
+    file ( GLOB_RECURSE
+        LOCAL_SOURCES2
+        "${CMAKE_CURRENT_SOURCE_DIR}/source**/*.cpp"
+    )
 
     source_group(
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -53,11 +58,12 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
 
     source_group(
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
-        FILES ${LOCAL_SOURCES}
+        FILES ${LOCAL_SOURCES} ${LOCAL_SOURCES2}
     )
 
     set ( ${HEADERS_OUTVARNAME} "${LOCAL_HEADERS};${LOCAL_HEADERS2}" PARENT_SCOPE )
     set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES}" PARENT_SCOPE )
+    set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES};${LOCAL_SOURCES2}" PARENT_SCOPE )
 endfunction ()
 
 # Function: get_git_version
