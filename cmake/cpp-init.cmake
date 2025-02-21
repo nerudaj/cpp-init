@@ -1,3 +1,19 @@
+# Function: download_file_if_not_there
+# Description: If there is no file at ${TARGET} path, attempts to download it from the internet
+# or creates an empty one if it fails
+# Arguments:
+#   URL - Url to download
+#   TARGET - Path to downloaded file
+function ( download_file_if_not_there URL TARGET )
+    if (NOT EXISTS ${TARGET})
+        file (TOUCH ${TARGET})
+        file (DOWNLOAD
+            ${URL}
+            ${TARGET}
+        )
+    endif()
+endfunction()
+
 # Function: bootstrap_cpm
 # Description: Bootstraps the CPM package manager by downloading and including the specified version of the CPM.cmake script.
 # Arguments:
@@ -23,6 +39,23 @@ function ( bootstrap_cpm )
     include ( "${CMAKE_CURRENT_BINARY_DIR}/get_cpm.cmake" )
 endfunction ()
 
+# Macro: set_cpp23_x64
+# Description: Sets the CMake generator platform to x64 and configures the C++ standard to C++23, ensuring that it is required.
+# Arguments: None
+macro ( set_cpp23_x64 )
+    set ( CMAKE_GENERATOR_PLATFORM     x64 )
+    set ( CMAKE_CXX_STANDARD		   23 )
+    set ( CMAKE_CXX_STANDARD_REQUIRED  ON )
+endmacro () 
+
+# Macro: cpp-init
+# Description: Initializes the project by calling the bootstrap_cpm function to set up CPM.cmake and the set_cpp23_x64 macro to configure the C++ standard and platform.
+# Arguments: None
+macro( cpp_init )
+    bootstrap_cpm()
+    set_cpp23_x64()
+endmacro ()
+
 # Function: glob_headers_and_sources
 # Description: Recursively globs header and source files, organizes them into source groups, and sets the output variables with the discovered files.
 # Arguments:
@@ -40,27 +73,47 @@ function ( glob_headers_and_sources HEADERS_OUTVARNAME SOURCES_OUTVARNAME )
 		LOCAL_HEADERS2
         "${CMAKE_CURRENT_SOURCE_DIR}/include**/*.h"
 	)
+    
+    file ( GLOB_RECURSE
+        PRIVATE_HEADERS
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/*.hpp"
+    )
+    
+    file ( GLOB_RECURSE
+        PRIVATE_HEADERS2
+        "${CMAKE_CURRENT_SOURCE_DIR}/private_include**/*.h"
+    )
 
     file ( GLOB_RECURSE
         LOCAL_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src**/*.cpp"
+    )
+    
+    file ( GLOB_RECURSE
+        LOCAL_SOURCES2
+        "${CMAKE_CURRENT_SOURCE_DIR}/source**/*.cpp"
     )
 
     source_group(
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
         FILES ${LOCAL_HEADERS} ${LOCAL_HEADERS2}
     )
+    
+    source_group(
+        TREE "${CMAKE_CURRENT_SOURCE_DIR}"
+        FILES ${PRIVATE_HEADERS} ${PRIVATE_HEADERS2}
+    )
 
     source_group(
         TREE "${CMAKE_CURRENT_SOURCE_DIR}"
-        FILES ${LOCAL_SOURCES}
+        FILES ${LOCAL_SOURCES} ${LOCAL_SOURCES2}
     )
 
-    set ( ${HEADERS_OUTVARNAME} "${LOCAL_HEADERS} ${LOCAL_HEADERS2}" PARENT_SCOPE )
-    set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES}" PARENT_SCOPE )
+    set ( ${HEADERS_OUTVARNAME} "${LOCAL_HEADERS};${LOCAL_HEADERS2};${PRIVATE_HEADERS};${PRIVATE_HEADERS2}" PARENT_SCOPE )
+    set ( ${SOURCES_OUTVARNAME} "${LOCAL_SOURCES};${LOCAL_SOURCES2}" PARENT_SCOPE )
 endfunction ()
 
-# Function: get_git_version
+# Function: get_version_from_git
 # Description: Retrieves the current git version using `git describe --tags` and sets the specified project version variables.
 # Arguments:
 #   PROJECT_VERSION_VARIABLE - Variable to store the inferred project version.
@@ -69,8 +122,8 @@ endfunction ()
 #   The version string is retrieved using the `git describe --tags` command, which extracts the latest annotated tag from the git history.
 #   The tags should follow the Semantic Versioning (semver) format, with an optional 'v' prefix. For example, 'v1.0.0' or '1.0.0'.
 # Example:
-#   get_git_version(PROJECT_VERSION_VARIABLE my_project_version FULL_VERSION_VARIABLE my_full_version)
-function ( get_git_version )
+#   get_version_from_git(PROJECT_VERSION_VARIABLE my_project_version FULL_VERSION_VARIABLE my_full_version)
+function ( get_version_from_git )
     set ( oneValueArgs PROJECT_VERSION_VARIABLE FULL_VERSION_VARIABLE )
 
     cmake_parse_arguments( GET_VERSION_FROM_GIT "" "${oneValueArgs}" "" ${ARGN} )
@@ -138,6 +191,7 @@ function ( fetch_prebuilt_dependency DEPNAME )
         URL "${FHD_URL}"
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         PREFIX "${CACHE_DIR}"
+        SOURCE_SUBDIR "does-not-exist"
     )
 
     __fetch_common ( ${DEPNAME} )
@@ -178,3 +232,134 @@ function ( fetch_headeronly_dependency DEPNAME )
     __fetch_common ( ${DEPNAME} )
     return ( PROPAGATE "${DEPNAME}_FOLDER" )
 endfunction ()
+
+function ( apply_compile_options TARGET )
+	if ( ${MSVC} )
+		target_compile_options ( ${TARGET}
+			PRIVATE
+			/W4
+			/MP
+			/we4265 # Missing virtual dtor
+			/we4834 # Discarding result of [[nodiscard]] function
+			/we4456 # Name shadowing
+			/we4457 # Name shadowing
+			/we4458 # Name shadowing
+			/we4459 # Name shadowing
+			# /wd4251
+			/we4369 # value of enum overflows underlying type
+			/we5205 # Dtor on iface is not virtual
+		)
+		
+		set_target_properties(
+			${TARGET} PROPERTIES
+			DEBUG_POSTFIX "-d"
+		)
+		
+		
+	else ()
+		message ( "apply_compile_options: no options for non-msvc compiler" )
+	endif ()
+endfunction ()
+
+function ( enable_autoformatter TARGET )
+	file ( COPY_FILE
+		"${CLANG_FORMAT_PATH}"
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
+	)
+
+	target_sources ( ${TARGET} PRIVATE 
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-format"
+	)
+endfunction ()
+
+# NOTE: C++23 doesn't go well with .clang-tidy v17 currently installed in MSVC
+function ( enable_linter TARGET )
+	file ( COPY_FILE
+		"${CLANG_TIDY_PATH}"
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
+	)
+
+	target_sources ( ${TARGET} PRIVATE 
+		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
+	)
+
+	if ( ${MSVC} )
+		set_target_properties ( ${TARGET} PROPERTIES
+			VS_GLOBAL_RunCodeAnalysis true
+			VS_GLOBAL_EnableMicrosoftCodeAnalysis false
+			VS_GLOBAL_EnableClangTidyCodeAnalysis true
+		)
+	else ()
+		message ( "apply_compile_options: no options for non-msvc compiler" )
+	endif ()
+endfunction ()
+
+macro ( link_public_header_folder TARGET )
+    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        target_include_directories( ${TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+    endif ()
+endmacro ()
+
+macro ( link_private_header_folder TARGET )
+    if ( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/private_include")
+        target_include_directories( ${TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private_include" )
+    endif ()
+endmacro ()
+
+macro ( make_static_library TARGET )
+    set( options )
+    set( multiValueArgs DEPS )
+
+    cmake_parse_arguments ( CIMSL "${options}" "" "${multiValueArgs}" ${ARGN} )
+
+    glob_headers_and_sources ( HEADERS SOURCES )
+
+    add_library( ${TARGET} STATIC ${HEADERS} ${SOURCES} )
+
+    link_public_header_folder ( ${TARGET} )
+    link_private_header_folder ( ${TARGET} )
+
+    if ( CIMSL_DEPS )
+        target_link_libraries ( ${TARGET} PUBLIC ${CIMSL_DEPS} )
+    endif ()
+
+    enable_autoformatter ( ${TARGET} )
+    apply_compile_options ( ${TARGET} )
+endmacro()
+
+macro ( make_executable TARGET )
+    set( options )
+    set( multiValueArgs DEPS )
+
+    cmake_parse_arguments ( CIME "${options}" "" "${multiValueArgs}" ${ARGN} )
+
+    glob_headers_and_sources ( HEADERS SOURCES )
+
+    add_executable( ${TARGET} ${HEADERS} ${SOURCES} )
+
+    link_public_header_folder ( ${TARGET} )
+    link_private_header_folder ( ${TARGET} )
+
+    if ( CIME_DEPS )
+        target_link_libraries ( ${TARGET} PUBLIC ${CIME_DEPS} )
+    endif ()
+
+    enable_autoformatter ( ${TARGET} )
+    apply_compile_options ( ${TARGET} )
+endmacro()
+
+### === BOOTSTRAPPING === ###
+set ( CPP_INIT_REF "heads/main" )
+# set ( CPP_INIT_REF "tags/v0.5.0" )
+
+set ( CLANG_FORMAT_PATH "${CMAKE_BINARY_DIR}/.clang-format" )
+download_file_if_not_there (
+    "https://raw.githubusercontent.com/nerudaj/cpp-init/refs/${CPP_INIT_REF}/.clang-format"
+    "${CLANG_FORMAT_PATH}"
+)
+
+set ( CLANG_TIDY_PATH "${CMAKE_BINARY_DIR}/.clang-tidy" )
+download_file_if_not_there (
+    "https://raw.githubusercontent.com/nerudaj/cpp-init/refs/${CPP_INIT_REF}/.clang-tidy"
+    "${CLANG_TIDY_PATH}"
+)
