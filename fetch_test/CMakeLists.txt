@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.26 )
 
-include ( "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/get_cpp_init.cmake" )
+include ( "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/cpp-init.cmake" )
 
 fetch_headeronly_dependency (
     JSON 
