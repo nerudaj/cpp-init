@@ -135,7 +135,7 @@ glob_headers_and_sources ( HEADER_FILES SOURCE_FILES )
 
 add_executable ( mytarget
 	${HEADER_FILES}
-	${SOURCE_FILES
+	${SOURCE_FILES}
 )
 ```
 
