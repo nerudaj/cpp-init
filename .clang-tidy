@@ -8,4 +8,5 @@ Checks: >
   bugprone-use-after-move
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: 'catch_amalgamated.*'
 FormatStyle: none
