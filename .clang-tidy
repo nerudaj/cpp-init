@@ -11,6 +11,7 @@ Checks: >
   bugprone-suspicious-enum-usage,
   bugprone-suspicious-include,
   bugprone-use-after-move,
+  clang-diagnostic-pessimizing-move,
   clang-diagnostic-unused-variable,
   cppcoreguidelines-avoid-non-const-global-variables,
   cppcoreguidelines-missing-std-forward,
