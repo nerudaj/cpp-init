@@ -1,240 +1,528 @@
 # cpp-init
 
-This repo hosts common configuration files I use in my C++ projects, namely:
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![C++](https://img.shields.io/badge/C%2B%2B-23-blue.svg)
+![CMake](https://img.shields.io/badge/CMake-3.26%2B-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
 
- * `.clang-format`
- * `.clang-tidy`
- * `cmake/cpp-init.cmake`
+**cpp-init** is a opinionated C++ project initialization toolkit that streamlines the setup and development of modern C++ projects. It provides:
 
-The `cpp-init.cmake` is an opinionated CMake helper that makes CMake much simpler by enforcing a bunch of rules on project structure.
+- 🚀 **Project Scaffolding**: Automated project structure generation with `cpp-init.bat`
+- 📦 **CMake Utilities**: Opinionated CMake helper (`cpp-init.cmake`) that simplifies project configuration
+- 🔧 **Development Tools**: Pre-configured `.clang-format` and `.clang-tidy` for consistent code style
+- 📚 **Dependency Management**: Integration with CPM (CMake Package Manager) for easy library inclusion
+- 🏷️ **Version Management**: Automatic semantic versioning from Git tags
 
 ## Table of Contents
 
- * [Project Structure](#project-structure)
- * [Quickstart Example](#quickstart-example)
- * [Documentation](#documentation)
- * [CMake Package Manager](#cmake-package-manager)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Using cpp-init.bat (Recommended)](#using-cpp-initbat-recommended)
+  - [Manual Setup](#manual-setup)
+- [Project Structure](#project-structure)
+- [Usage Examples](#usage-examples)
+- [API Documentation](#api-documentation)  
+- [CMake Package Manager](#cmake-package-manager)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Installation
+
+### Download from Releases (Recommended)
+
+1. Download the latest release from the [Releases page](https://github.com/nerudaj/cpp-init/releases/latest)
+2. Extract the archive to your desired location
+3. Add the location to your PATH (optional, for global access to `cpp-init.bat`)
+
+### Clone from Source
+
+```bash
+git clone https://github.com/nerudaj/cpp-init.git
+cd cpp-init
+```
+
+## Quick Start
+
+### Using cpp-init.bat (Recommended)
+
+The fastest way to get started is using the included batch script that automatically scaffolds your project:
+
+```bash
+# Navigate to your projects directory
+cd /path/to/your/projects
+
+# Run the initialization script
+cpp-init.bat
+```
+
+The script will prompt you for:
+- **Project name**: The name of your project
+- **Library target**: Whether to create a library component (y/n)
+
+This automatically creates:
+- ✅ Proper folder structure (`bin/`, `lib/`, `tests/`)  
+- ✅ Downloads latest `cpp-init.cmake`
+- ✅ Generates `CMakeLists.txt` files
+- ✅ Sets up semantic versioning from Git
+
+**Example output structure:**
+```
+MyProject/
+├── cmake/
+│   └── cpp-init.cmake         # Downloaded automatically
+├── bin/                       # Executable target
+│   ├── include/
+│   ├── src/
+│   └── CMakeLists.txt
+├── lib/                       # Library target (if requested)
+│   ├── include/
+│   ├── src/
+│   └── CMakeLists.txt  
+├── tests/                     # Test target (if library requested)
+│   ├── include/
+│   ├── src/
+│   └── CMakeLists.txt
+└── CMakeLists.txt             # Root CMake file
+```
+
+### Manual Setup
+
+If you prefer manual setup or need more control:
+
+1. Download `cpp-init.cmake` from the [Releases page](https://github.com/nerudaj/cpp-init/releases/latest)
+2. Place it in your project's `cmake/` directory
+3. Follow the [project structure guidelines](#project-structure) below
+4. See [usage examples](#usage-examples) for CMakeLists.txt setup
 
 ## Project Structure
 
-For each compilable target, the recommended folder structure is this:
+cpp-init enforces a consistent, scalable project structure that works well for both small utilities and large applications:
+
+### Standard Layout
 
 ```
-\root
-	- \include
-		- File.hpp
-	- \src
-		- File.cpp
-	- CMakeLists.txt
+project-root/
+├── cmake/
+│   └── cpp-init.cmake          # CMake utilities
+├── include/                    # Public headers
+│   └── MyHeader.hpp            
+├── src/                        # Source files (or 'source/')
+│   ├── MyImplementation.cpp
+│   └── main.cpp
+├── private_include/            # Private headers (optional)
+│   └── Internal.hpp
+└── CMakeLists.txt
 ```
 
-Scripts present in this repo are conditioned to follow this structure, with a little bit of leevay. The `src` folder can also be called `source`. Allowed extensions for header files are `hpp` and `h`. Header files must always be in a folder `include` or `private_include` (the latter is for headers that should not be accessible by dependent targets).
+### Multi-Target Project Layout
 
-These scripts also rely on globbing (recursively scanning) for source files, instead of you having to manually specify them in CMakeLists.txt. This makes project maintenance much easier, but if you delete a file, `cmake --build` command will not detect it automatically and will fail compilation.
+```
+project-root/
+├── cmake/
+│   └── cpp-init.cmake
+├── bin/                        # Executable target
+│   ├── include/
+│   ├── src/
+│   │   └── main.cpp
+│   └── CMakeLists.txt
+├── lib/                        # Library target  
+│   ├── include/
+│   │   └── MyLib.hpp
+│   ├── src/
+│   │   └── MyLib.cpp
+│   └── CMakeLists.txt
+├── tests/                      # Test target
+│   ├── include/
+│   ├── src/
+│   │   └── test_main.cpp
+│   └── CMakeLists.txt
+└── CMakeLists.txt              # Root configuration
+```
 
-If you delete a source file, you always need to manually reconfigure. Lastly, scripts here are tailored towards MSVC. PRs for your favorite platforms are welcomed.
+### Folder Rules
 
-### Semantic versioning
+- **Headers**: Must be in `include/` (public) or `private_include/` (internal)
+- **Sources**: Must be in `src/` or `source/`
+- **Extensions**: `.hpp` and `.h` for headers, `.cpp` for sources
+- **Auto-detection**: Files are found automatically via globbing (no manual listing required)
+- **File Changes**: Adding files is automatic, removing files requires CMake reconfiguration
 
-This project also promotes [semantic versioning](https://semver.org/). You can easily read the current version from the git tags, insert it into your project declaration and it will propagate further into packaging, etc.
+### Semantic Versioning
 
-If you're new to git, you can mark the current commit with version like this:
+cpp-init promotes [semantic versioning](https://semver.org/) using Git tags:
 
-```sh
-git tag v0.1.0
+```bash
+# Tag your releases
+git tag v1.0.0
 git push --tags
+
+# Version automatically available in CMake
 ```
 
-## Quickstart Example
+## Usage Examples
 
-Suppose you want to make a simple executable with a bunch of header and source files. Follow this folder structure:
+### Simple Executable
 
-```
-\root
-	- \cmake
-		- cpp-init.cmake
-	- \include
-		- HeaderA.hpp
-		- HeaderB.hpp
-	- \src
-		- ImplA.cpp
-		- ImplB.cpp
-		- Main.cpp
-	- CMakeLists.txt
-```
-
-Obtain the `cpp-init.cmake` by downloading the latest version from the [Releases](https://github.com/nerudaj/cpp-init/releases/latest) page.
-
-Put the following code in the `CMakeLists.txt`:
+Create a basic executable project with external dependencies:
 
 ```cmake
-cmake_minimum_required ( VERSION 3.26 )
+cmake_minimum_required(VERSION 3.26)
 
-include ( "cmake/cpp-init.cmake" )
+include("cmake/cpp-init.cmake")
 
 cpp_init()
-get_version_from_git ( PROJECT_VERSION_VARIABLE GIT_FULL_VERSION )
+get_version_from_git(PROJECT_VERSION_VARIABLE GIT_FULL_VERSION)
 
-project ( Example VERSION ${PROJECT_VERSION_VARIABLE} )
+project(MyApp VERSION ${PROJECT_VERSION_VARIABLE})
 
-CPMAddPackage ( "gh:nlohmann/json@3.11.2" )
+# Add dependencies via CPM
+CPMAddPackage("gh:nlohmann/json@3.11.3")
+CPMAddPackage("gh:fmtlib/fmt@10.1.1")
 
-make_executable ( ${PROJECT_NAME} DEPS nlohmann_json::nlohmann_json )
-```
-
-The `cpp_init()`, `get_version_from_git()`, and `make_executable()` are all from the `cpp-init.cmake` and are documented below.
-
-This example autodetects header and source files in the appropriate folders, creates an executable target called `${PROJECT_NAME}` and links nlohmann JSON library to it. It also reads project semantic version from git tags and applies it to the project.
-
-## Documentation
-
-This section describes utility functions present in the `cpp-init.cmake` file.
-
-### download_file_if_not_there
-
-If a file with a TARGET name is not yet present, this function attepts to download it from a given URL. If not successful, empty file is created instead.
-
-```cmake
-download_file_if_not_there (
-	"http://myurl.com/file.txt"
-	"${CMAKE_BINARY_DIR}/file.txt"
+# Create executable with automatic file detection
+make_executable(${PROJECT_NAME} 
+    DEPS nlohmann_json::nlohmann_json fmt::fmt
 )
 ```
 
-### bootstrap_cpm
+### Library with Tests
 
-Downloads `CPM.cmake` and includes it. You can specify a particular version or stick with the latest:
+Create a static library and test executable:
 
 ```cmake
-include ( "${cppinit_folder}/cmake/bootstrap.cmake" )
+# Root CMakeLists.txt
+cmake_minimum_required(VERSION 3.26)
 
-bootstrap_cpm ( 0.30.2 ) # version number is optional
+include("cmake/cpp-init.cmake")
+cpp_init()
+get_version_from_git(PROJECT_VERSION_VARIABLE GIT_FULL_VERSION)
 
-# CPM can now be used
-CPMAddPackage( "gh:nlohmann/json@3.11.2" )
+project(MyLibrary VERSION ${PROJECT_VERSION_VARIABLE})
+
+enable_testing()
+
+add_subdirectory(lib)
+add_subdirectory(bin)        # Example executable using the library  
+add_subdirectory(tests)
 ```
 
-### set_cpp23_x64
-
-Sets the required C++ standard to 23 and sets the target platform to x64.
-
-### cpp_init
-
-Shorthand for calling `bootstrap_cpm` and `set_cpp23_x64`.
-
-### glob_headers_and_sources
-
-In current source directory, recursively looks for .h/.hpp files in folders `include` and `private_include`, adds them to IDE through `source_group` call and saves them in `HEADERS_OUTVARNAME` variable.
-
-Also looks for .cpp files in `source` and `src` folders, adds them to IDE and saves them in `SOURCES_OUTVARNAME`.
-
-If the `${CMAKE_CURRENT_SOURCE_DIR}` contains subfolders `include` and `src`, this will recursively glob all `.hpp` files in the `include` folder and all `.cpp` files in the `src` folder. It will add them to your IDE filters through `source_group` call and it will populate the output variables.
-
 ```cmake
-glob_headers_and_sources ( HEADER_FILES SOURCE_FILES )
-
-add_executable ( mytarget
-	${HEADER_FILES}
-	${SOURCE_FILES}
+# lib/CMakeLists.txt  
+make_static_library(${PROJECT_NAME}
+    DEPS nlohmann_json::nlohmann_json
 )
 ```
 
-Just know that newly added files will be automatically found on subsequent builds while if you remove a file, you need to reconfigure manually.
-
-### get_git_version
-
-Reads the current git version for use in project declarations and packaging.
-
 ```cmake
-get_git_version (
-	PROJECT_VERSION_VARIABLE GIT_PROJECT_VERSION
-	FULL_VERSION_VARIABLE FULL_PROJECT_VERSION
+# tests/CMakeLists.txt
+CPMAddPackage("gh:catchorg/Catch2@v3.7.1")
+
+make_executable(${PROJECT_NAME}_tests
+    DEPS ${PROJECT_NAME} Catch2::Catch2WithMain
 )
 
-# GIT_PROJECT_VERSION is <number>.<number>.<number>
-project ( demo VERSION ${GIT_PROJECT_VERSION} )
-
-# FULL_PROJECT_VERSION is the full output of `git describe` including the number of commits since the last tag and the current commit hash
+include(CTest)
+include(Catch)
+catch_discover_tests(${PROJECT_NAME}_tests)
 ```
 
-The version is read from git tags using `git describe`. Tagname is allowed to be prefixed with `v`. This prefix will be stripped from the short project version.
+### Advanced Configuration
 
-### fetch_prebuilt_dependency
-
-CPM is great, but you pay with long build times. Many libraries on GitHub come packaged for you in the Releases tab, so we can download them easily:
+Using multiple features together:
 
 ```cmake
-fetch_prebuilt_dependency (
-	SFML
-	URL https://github.com/SFML/SFML/releases/download/2.6.1/SFML-2.6.1-windows-vc17-64-bit.zip
-	CACHE_DIR "C:/deps" # optional: can download to given location
+cmake_minimum_required(VERSION 3.26)
+
+include("cmake/cpp-init.cmake")
+
+# Initialize with custom C++ standard
+set_cpp23_x64()
+bootstrap_cpm()
+
+get_version_from_git(
+    PROJECT_VERSION_VARIABLE GIT_PROJECT_VERSION
+    FULL_VERSION_VARIABLE GIT_FULL_VERSION  
 )
 
-# unpacked archive contents are in ${SFML_FOLDER}
-```
+project(AdvancedProject VERSION ${GIT_PROJECT_VERSION})
 
-Unlike `FetchContent_MakeAvailable`, this only downloads and unpacks the archive. It does not look for `CMakeLists.txt` inside the archive, nor it calls `add_subdirectory`.
-
-### fetch_headeronly_dependency
-
-Downloads a single file, presumably a headeronly library.
-
-```cmake
-fetch_headeronly_dependency (
-	JSON 
-	URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
-	CACHE_DIR "C:/deps" # optional: can download to given location
+# Fetch prebuilt dependencies
+fetch_prebuilt_dependency(
+    SFML
+    URL https://github.com/SFML/SFML/releases/download/2.6.1/SFML-2.6.1-windows-vc17-64-bit.zip
+    CACHE_DIR "C:/deps"
 )
 
-# json.hpp is located in ${JSON_FOLDER}
+# Manual target creation with all bells and whistles
+glob_headers_and_sources(HEADERS SOURCES)
+
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
+apply_compile_options(${PROJECT_NAME})
+enable_autoformatter(${PROJECT_NAME})
+enable_linter(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${SFML_FOLDER}/include)
+target_link_directories(${PROJECT_NAME} PRIVATE ${SFML_FOLDER}/lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-window sfml-system)
 ```
 
-### apply_compile_options
+## API Documentation
 
-**NOTE:** Currently only supported with MSVC generator.
+This section describes utility functions and macros present in the `cpp-init.cmake` file.
 
-Applies a set of useful compiler diagnostics and settings. For MSVC, postfixes all artifacts compiled under Debug with `-d` postfix.
+### Core Initialization Functions
+
+#### `cpp_init()`
+
+**Description**: Initializes cpp-init by bootstrapping CPM package manager and setting C++23/x64 configuration.  
+**Type**: Macro  
+**Arguments**: None  
 
 ```cmake
-apply_compile_options ( ${TARGET} )
+cpp_init()
+# Equivalent to calling bootstrap_cpm() and set_cpp23_x64()
 ```
 
-### enable_autoformatter
+#### `bootstrap_cpm([VERSION version])`
 
-Copies `.clang-format` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources. In MSVC, you can press Alt F+K to format your code or install Format on Save extension.
+**Description**: Downloads and includes the CPM.cmake package manager.  
+**Type**: Function  
+**Arguments**:  
+- `VERSION` (optional): Specific CPM version to download (default: "latest")
 
 ```cmake
-enable_autoformatter ( ${TARGET} )
+bootstrap_cpm()                    # Uses latest version
+bootstrap_cpm(VERSION "v0.34.0")   # Uses specific version
+
+# CPM is now available
+CPMAddPackage("gh:nlohmann/json@3.11.3")
 ```
 
-### enable_linter
+#### `set_cpp23_x64()`
 
-Copies `.clang-tidy` to `${CMAKE_CURRENT_SOURCE_DIR}` and adds them to the specified target sources. For MSVC, it turns on static code analysis with clang-tidy. Note that MSVC ships with some old clang-tidy implementation so you likely need to install newer one yourself.
+**Description**: Configures project for C++23 standard with x64 platform.  
+**Type**: Macro  
+**Arguments**: None  
 
 ```cmake
-enable_linter ( ${TARGET} )
+set_cpp23_x64()
+# Sets CMAKE_GENERATOR_PLATFORM=x64, CMAKE_CXX_STANDARD=23
 ```
 
-### make_static_library
+### File Discovery and Versioning
 
-A shorthand for calling `glob_headers_and_sources`, `apply_compile_options` and bunch of other options. Declares `include` folder as public include directory.
+#### `glob_headers_and_sources(HEADERS_VAR SOURCES_VAR)`
 
-Optionally you can specify a list of dependencies for public linkage.
+**Description**: Automatically discovers and organizes project files into IDE source groups.  
+**Type**: Function  
+**Arguments**:  
+- `HEADERS_VAR`: Variable name to store discovered header files
+- `SOURCES_VAR`: Variable name to store discovered source files  
+
+**File Discovery Rules**:  
+- Headers: `include/**/*.{hpp,h}` and `private_include/**/*.{hpp,h}`  
+- Sources: `src/**/*.cpp` and `source/**/*.cpp`  
+- Automatically creates IDE source groups  
+- New files detected on build; removed files require reconfiguration  
 
 ```cmake
-make_static_library ( myLib DEPS nlohmann_json::nlohmann_json )
+glob_headers_and_sources(MY_HEADERS MY_SOURCES)
 
-# globs include/src folders
-# applies compile options
-# declares include folder as public include dir
-# links nlohmann
-# enables autoformatter
-# ...
+add_executable(mytarget ${MY_HEADERS} ${MY_SOURCES})
 ```
 
-### make_executable
+#### `get_version_from_git(PROJECT_VERSION_VARIABLE var [FULL_VERSION_VARIABLE full_var])`
 
-Similar as `make_static_library`, just for executables.
+**Description**: Extracts semantic version from Git tags for project versioning.  
+**Type**: Function  
+**Arguments**:  
+- `PROJECT_VERSION_VARIABLE`: Variable to store semantic version (e.g., "1.2.3")  
+- `FULL_VERSION_VARIABLE` (optional): Variable to store full git describe output  
+
+**Requirements**: Git repository with tagged releases (supports optional 'v' prefix)
+
+```cmake
+get_version_from_git(
+    PROJECT_VERSION_VARIABLE GIT_PROJECT_VERSION
+    FULL_VERSION_VARIABLE GIT_FULL_VERSION
+)
+
+project(MyApp VERSION ${GIT_PROJECT_VERSION})
+# GIT_PROJECT_VERSION = "1.2.3" 
+# GIT_FULL_VERSION = "v1.2.3-5-g1234abc" (full git describe)
+```
+
+### Dependency Management
+
+#### `fetch_prebuilt_dependency(DEPNAME URL url [CACHE_DIR dir])`
+
+**Description**: Downloads and unpacks prebuilt libraries from GitHub releases, bypassing compilation time.  
+**Type**: Function  
+**Arguments**:  
+- `DEPNAME`: Dependency name (creates `${DEPNAME}_FOLDER` variable)  
+- `URL`: Download URL for the archive  
+- `CACHE_DIR` (optional): Custom cache location (default: `${PROJECT_BINARY_DIR}/_deps`)  
+
+**Use Case**: Ideal for large libraries like SFML that provide precompiled releases  
+**Note**: Only downloads and extracts; does not call `add_subdirectory()`  
+
+```cmake
+fetch_prebuilt_dependency(
+    SFML
+    URL https://github.com/SFML/SFML/releases/download/2.6.1/SFML-2.6.1-windows-vc17-64-bit.zip
+    CACHE_DIR "C:/deps"
+)
+
+# Use extracted content
+target_include_directories(myapp PRIVATE ${SFML_FOLDER}/include)
+target_link_directories(myapp PRIVATE ${SFML_FOLDER}/lib)
+```
+
+#### `fetch_headeronly_dependency(DEPNAME URL url [CACHE_DIR dir])`
+
+**Description**: Downloads single header-only files from URLs.  
+**Type**: Function  
+**Arguments**:  
+- `DEPNAME`: Dependency name (creates `${DEPNAME}_FOLDER` variable)  
+- `URL`: Direct URL to header file  
+- `CACHE_DIR` (optional): Custom cache location (default: `${PROJECT_BINARY_DIR}/_deps`)  
+
+**Use Case**: Perfect for single-header libraries  
+
+```cmake
+fetch_headeronly_dependency(
+    JSON
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
+)
+
+target_include_directories(myapp PRIVATE ${JSON_FOLDER})
+```
+
+#### `download_file_if_not_there(URL TARGET)`
+
+**Description**: Downloads a file only if it doesn't exist locally; creates empty file if download fails.  
+**Type**: Function  
+**Arguments**:  
+- `URL`: Source URL
+- `TARGET`: Local file path  
+
+```cmake
+download_file_if_not_there(
+    "https://example.com/config.json"
+    "${CMAKE_BINARY_DIR}/config.json"
+)
+```
+
+### Development Tools
+
+#### `apply_compile_options(TARGET)`
+
+**Description**: Applies recommended compiler flags and diagnostic settings.  
+**Type**: Function  
+**Platform**: Currently MSVC only  
+**Arguments**:  
+- `TARGET`: CMake target name  
+
+**MSVC Settings**:  
+- `/W4`: High warning level  
+- `/MP`: Multi-processor compilation  
+- Elevated warnings for common issues (shadowing, missing virtual destructors, etc.)  
+- Debug builds get `-d` postfix  
+
+```cmake
+apply_compile_options(mytarget)
+```
+
+#### `enable_autoformatter(TARGET)`
+
+**Description**: Integrates clang-format for consistent code formatting.  
+**Type**: Function  
+**Arguments**:  
+- `TARGET`: CMake target name  
+
+**Actions**:  
+- Downloads and copies `.clang-format` to project directory  
+- Adds format file to target sources (visible in IDE)  
+- In Visual Studio: Use Alt+K+F or enable "Format on Save"  
+
+```cmake
+enable_autoformatter(mytarget)
+```
+
+#### `enable_linter(TARGET)`
+
+**Description**: Integrates clang-tidy static analysis.  
+**Type**: Function  
+**Platform**: MSVC integration only  
+**Arguments**:  
+- `TARGET`: CMake target name  
+
+**Actions**:  
+- Downloads and copies `.clang-tidy` to project directory  
+- Enables clang-tidy in Visual Studio project settings  
+- **Note**: Consider installing newer clang-tidy version than MSVC default  
+
+```cmake
+enable_linter(mytarget)
+```
+
+### High-Level Target Creation
+
+#### `make_static_library(TARGET [DEPS dependencies...] [ENABLE_LINTER])`
+
+**Description**: Creates a static library target with all cpp-init best practices applied automatically.  
+**Type**: Macro  
+**Arguments**:  
+- `TARGET`: Library target name  
+- `DEPS` (optional): List of dependencies to link publicly  
+- `ENABLE_LINTER` (optional): Enable clang-tidy analysis  
+
+**Automatic Actions**:  
+- ✅ Globs headers and sources (`glob_headers_and_sources`)  
+- ✅ Creates static library target  
+- ✅ Links public include directory (`include/` → PUBLIC)  
+- ✅ Links private include directory (`private_include/` → PRIVATE)  
+- ✅ Applies compiler options (`apply_compile_options`)  
+- ✅ Enables autoformatting (`enable_autoformatter`)  
+- ✅ Links dependencies (if specified)  
+- ✅ Enables linting (if `ENABLE_LINTER` specified)  
+
+```cmake
+make_static_library(MyLib 
+    DEPS nlohmann_json::nlohmann_json fmt::fmt
+    ENABLE_LINTER
+)
+```
+
+#### `make_executable(TARGET [DEPS dependencies...] [ENABLE_LINTER])`
+
+**Description**: Creates an executable target with all cpp-init best practices applied automatically.  
+**Type**: Macro  
+**Arguments**:  
+- `TARGET`: Executable target name  
+- `DEPS` (optional): List of dependencies to link  
+- `ENABLE_LINTER` (optional): Enable clang-tidy analysis  
+
+**Automatic Actions**: Same as `make_static_library` but creates executable instead  
+
+```cmake
+make_executable(MyApp 
+    DEPS MyLib Catch2::Catch2WithMain
+    ENABLE_LINTER
+)
+```
+
+### Utility Macros
+
+#### `link_public_header_folder(TARGET)`
+
+**Description**: Links `include/` directory as PUBLIC if it exists.  
+**Type**: Macro  
+
+#### `link_private_header_folder(TARGET)`
+
+**Description**: Links `private_include/` directory as PRIVATE if it exists.  
+**Type**: Macro
 
 ## CMake Package Manager
 
@@ -254,3 +542,49 @@ CPM is great, but I can never remember the author nor the CMake target I can lin
 | nlohmann json | 3.11.3 | `gh:nlohmann/json#v3.11.3` | nlohmann::json |
 | SFML | 2.6.1 | `gh:SFML/SFML#2.6.1` | sfml-main sfml-audio sfml-graphics sfml-window sfml-network |
 | SFML 3 | 3.0.0 | `gh:SFML/SFML#3.0.0` | SFML::Main SFML::Audio SFML::Graphics SFML::Window SFML::Network |
+
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+### Reporting Issues
+- Use the [GitHub issue tracker](https://github.com/nerudaj/cpp-init/issues) 
+- Include your system information (Windows version, CMake version, etc.)
+- Provide a minimal reproduction case
+
+### Contributing Code
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Test** your changes with the integration test  
+4. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+5. **Push** to the branch (`git push origin feature/amazing-feature`)
+6. **Open** a Pull Request
+
+### Platform Support
+Currently optimized for **Windows/MSVC**. PRs welcome for:
+- 🐧 Linux/GCC support
+- 🍎 macOS/Clang support  
+- 🔧 Other build systems
+
+### Testing Changes
+```bash
+# Run integration tests
+cd integration_test
+cmake -B build -S .
+cmake --build build
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Components
+- **CPM.cmake**: Used for package management
+- **clang-format**: Code formatting
+- **clang-tidy**: Static analysis
+
+---
+
+**Made with ❤️ for the C++ community**
+
+If cpp-init helped you kickstart your project, consider giving it a ⭐!
