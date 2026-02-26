@@ -21,7 +21,6 @@ Checks: >
   google-explicit-constructor,
   misc-const-correctness,
   modernize-avoid-bind,
-  modernize-pass-by-value,
   modernize-use-nodiscard,
   modernize-use-override,
   performance-move-const-arg,
