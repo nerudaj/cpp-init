@@ -7,6 +7,8 @@ cpp-init v0.x changelog:
 * Fixed bad glob expression in `glob_headers_and_sources` and added CONFIGURE_DEPENDS
     * If you work with CMakePresets.json, this should work better than explicitly listing sources
 * Fixed too lenient regex in `get_version_from_git`
+* Removed `cpp_init()` and `set_cpp23_x64()`
+    * These were anti-patterns, one shall use CMakePresets to set these kinds of things
 
 cpp-init v0.6 changelog:
 * Multiple .cmake files were condensed into single `cpp-init.cmake`

@@ -44,37 +44,6 @@ function ( bootstrap_cpm )
     include ( "${CMAKE_CURRENT_BINARY_DIR}/get_cpm.cmake" )
 endfunction ()
 
-# Macro: set_cpp23_x64
-# Type: Macro
-# Description: Configures the project for modern C++23 development with x64 architecture.
-# Arguments: None
-# Effects:
-#   - Sets CMAKE_GENERATOR_PLATFORM to x64
-#   - Sets CMAKE_CXX_STANDARD to 23
-#   - Sets CMAKE_CXX_STANDARD_REQUIRED to ON
-# Use Case: Standard configuration for modern C++ projects targeting 64-bit platforms
-macro ( set_cpp23_x64 )
-    set ( CMAKE_GENERATOR_PLATFORM     x64 )
-    set ( CMAKE_CXX_STANDARD		   23 )
-    set ( CMAKE_CXX_STANDARD_REQUIRED  ON )
-endmacro () 
-
-# Macro: cpp_init
-# Type: Macro
-# Description: Complete initialization of cpp-init toolkit with recommended defaults.
-# Arguments: None
-# Effects:
-#   - Downloads and includes CPM package manager (bootstrap_cpm)
-#   - Configures C++23/x64 settings (set_cpp23_x64)
-# Use Case: One-line setup for new projects using cpp-init
-# Example:
-#   cpp_init()
-#   # Now ready to use CPMAddPackage() and modern C++ features
-macro( cpp_init )
-    bootstrap_cpm()
-    set_cpp23_x64()
-endmacro ()
-
 # Function: glob_headers_and_sources
 # Type: Function
 # Description: Automatically discovers project files and organizes them for IDE integration.
