@@ -1,4 +1,4 @@
-cpp-init v0.x changelog:
+cpp-init v0.7.0 changelog:
 * Improved `apply_compile_options`
     * Added compile flags for non-MSVC compilers
     * Renamed to `apply_recommended_compile_options`
