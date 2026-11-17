@@ -1,3 +1,6 @@
+cpp-init v0.x changelog:
+* Fixed bad download URL in bootstrap_cpm when specific version was requested
+
 cpp-init v0.6 changelog:
 * Multiple .cmake files were condensed into single `cpp-init.cmake`
 * C++ standard and generator platform is no longer set by default, you have to call `set_cpp23_x64` or `cpp_init`
