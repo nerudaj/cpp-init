@@ -297,12 +297,11 @@ function ( fetch_headeronly_dependency DEPNAME )
     return ( PROPAGATE "${DEPNAME}_FOLDER" )
 endfunction ()
 
-# Function: apply_compile_options
+# Function: apply_recommended_compile_options
 # Type: Function
 # Description: Applies recommended compiler flags and diagnostic settings for high-quality code.
 # Arguments:
 #   TARGET - CMake target name to configure
-# Platform Support: Currently MSVC only
 # MSVC Settings Applied:
 #   /W4 - High warning level
 #   /MP - Multi-processor compilation
@@ -311,33 +310,27 @@ endfunction ()
 #   /we4456-4459 - Name shadowing (error)
 #   /we4369 - Enum value overflow (error)
 #   /we5205 - Non-virtual interface destructor (error)
+# Non-MSVC Settings Applied:
+#   -Wall
+#   -Wextra
+#   -Wpedantic
+#   -Werror=shadow
+#   -Werror=non-virtual-dtor
 # Effects:
-#   - Debug builds get "-d" postfix for easy identification
+#   - Debug builds get "-d" postfix for easy identification (MSVC only)
 # Use Case: Enforces high code quality standards and catches common mistakes
-function ( apply_compile_options TARGET )
-	if ( ${MSVC} )
-		target_compile_options ( ${TARGET}
-			PRIVATE
-			/W4
-			/MP
-			/we4265 # Missing virtual dtor
-			/we4834 # Discarding result of [[nodiscard]] function
-			/we4456 # Name shadowing
-			/we4457 # Name shadowing
-			/we4458 # Name shadowing
-			/we4459 # Name shadowing
-			# /wd4251
-			/we4369 # value of enum overflows underlying type
-			/we5205 # Dtor on iface is not virtual
-		)
-		
+function ( apply_recommended_compile_options TARGET )
+    target_compile_options ( ${TARGET}
+        PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /MP /we4265 /we4834 /we4456 /we4457 /we4458 /we4459 /we4369 /we5205>
+        $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall -Wextra -Wpedantic -Werror=shadow -Werror=non-virtual-dtor>
+    )
+
+    if ( ${MSVC} )
 		set_target_properties(
 			${TARGET} PROPERTIES
 			DEBUG_POSTFIX "-d"
-		)
-		
-	else ()
-		message ( "apply_compile_options: no options for non-msvc compiler" )
+		)	
 	endif ()
 endfunction ()
 
@@ -432,14 +425,14 @@ endmacro ()
 # Named Parameters:
 #   DEPS - List of dependencies to link publicly
 # Automatic Actions:
-#   ✓ Globs headers and sources (glob_headers_and_sources)
-#   ✓ Creates static library target
-#   ✓ Links public headers (include/ → PUBLIC)
-#   ✓ Links private headers (private_include/ → PRIVATE)
-#   ✓ Links dependencies (if specified)
-#   ✓ Applies compiler options (apply_compile_options)
-#   ✓ Enables autoformatting (enable_autoformatter)
-#   ✓ Enables linting (if ENABLE_LINTER specified)
+#   - Globs headers and sources (glob_headers_and_sources)
+#   - Creates static library target
+#   - Links public headers (include/ → PUBLIC)
+#   - Links private headers (private_include/ → PRIVATE)
+#   - Links dependencies (if specified)
+#   - Applies compiler options (apply_recommended_compile_options)
+#   - Enables autoformatting (enable_autoformatter)
+#   - Enables linting (if ENABLE_LINTER specified)
 # Use Case: One-line library creation with all best practices
 # Example:
 #   make_static_library(MyLib DEPS nlohmann_json::nlohmann_json ENABLE_LINTER)
@@ -465,7 +458,7 @@ macro ( make_static_library TARGET )
     endif ()
 
     enable_autoformatter ( ${TARGET} )
-    apply_compile_options ( ${TARGET} )
+    apply_recommended_compile_options ( ${TARGET} )
 endmacro()
 
 # Macro: make_executable
@@ -478,14 +471,14 @@ endmacro()
 # Named Parameters:
 #   DEPS - List of dependencies to link
 # Automatic Actions:
-#   ✓ Globs headers and sources (glob_headers_and_sources)
-#   ✓ Creates executable target
-#   ✓ Links public headers (include/ → PUBLIC)
-#   ✓ Links private headers (private_include/ → PRIVATE)
-#   ✓ Links dependencies (if specified)
-#   ✓ Applies compiler options (apply_compile_options)
-#   ✓ Enables autoformatting (enable_autoformatter)
-#   ✓ Enables linting (if ENABLE_LINTER specified)
+#   - Globs headers and sources (glob_headers_and_sources)
+#   - Creates executable target
+#   - Links public headers (include/ → PUBLIC)
+#   - Links private headers (private_include/ → PRIVATE)
+#   - Links dependencies (if specified)
+#   - Applies compiler options (apply_recommended_compile_options)
+#   - Enables autoformatting (enable_autoformatter)
+#   - Enables linting (if ENABLE_LINTER specified)
 # Use Case: One-line executable creation with all best practices
 # Example:
 #   make_executable(MyApp DEPS MyLib Catch2::Catch2WithMain ENABLE_LINTER)
@@ -511,7 +504,7 @@ macro ( make_executable TARGET )
     endif ()
 
     enable_autoformatter ( ${TARGET} )
-    apply_compile_options ( ${TARGET} )
+    apply_recommended_compile_options ( ${TARGET} )
 endmacro()
 
 ### === BOOTSTRAPPING === ###

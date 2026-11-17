@@ -3,6 +3,9 @@ cpp-init v0.x changelog:
 * Fixed bad glob expression in `glob_headers_and_sources` and added CONFIGURE_DEPENDS
     * If you work with CMakePresets.json, this should work better than explicitly listing sources
 * Fixed too lenient regex in `get_version_from_git`
+* Improved `apply_compile_options`
+    * Added compile flags for non-MSVC compilers
+    * Renamed to `apply_recommended_compile_options`
 
 cpp-init v0.6 changelog:
 * Multiple .cmake files were condensed into single `cpp-init.cmake`
