@@ -2,6 +2,7 @@ cpp-init v0.x changelog:
 * Fixed bad download URL in bootstrap_cpm when specific version was requested
 * Fixed bad glob expression in `glob_headers_and_sources` and added CONFIGURE_DEPENDS
     * If you work with CMakePresets.json, this should work better than explicitly listing sources
+* Fixed too lenient regex in `get_version_from_git`
 
 cpp-init v0.6 changelog:
 * Multiple .cmake files were condensed into single `cpp-init.cmake`

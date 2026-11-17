@@ -162,6 +162,7 @@ endfunction ()
 #   - Executes 'git describe --tags' to get version info
 #   - Extracts semantic version using regex pattern
 #   - Supports tags like 'v1.0.0' or '1.0.0'
+#   - Suffixes to version (such as v0.0.1-alpha7) are ignored
 # Use Case: Automatic version management synchronized with Git releases
 # Example:
 #   get_version_from_git(
@@ -183,7 +184,7 @@ function ( get_version_from_git )
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
-    string ( REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+" LOCAL_CORE_VERSION "${LOCAL_STDOUT}" )
+    string ( REGEX MATCH "[0-9]+[.][0-9]+[.][0-9]+" LOCAL_CORE_VERSION "${LOCAL_STDOUT}" )
 
     message ( "Found full git version: ${LOCAL_STDOUT}" )
     message ( "Inferred project version: ${LOCAL_CORE_VERSION}" )
