@@ -2,7 +2,7 @@ cmake_minimum_required ( VERSION 3.26 )
 
 include ( "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/cpp-init.cmake" )
 
-cpp_init()
+bootstrap_cpm()
 
 project ( TEST )
 

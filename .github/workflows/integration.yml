@@ -23,7 +23,7 @@ jobs:
           run: |
             mkdir _build
             cd _build
-            cmake ..
+            cmake .. -D CMAKE_CXX_STANDARD=23 -D CMAKE_CXX_STANDARD_REQUIRED=ON
           shell: cmd
         
         - name: Build
