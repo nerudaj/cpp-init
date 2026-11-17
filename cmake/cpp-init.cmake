@@ -31,6 +31,7 @@ function ( bootstrap_cpm )
 
     cmake_parse_arguments( BOOTSTRAP_CPM "" "${oneValueArgs}" "" ${ARGN} )
 
+    set ( GET_CPM_URL "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake" )
     if ( BOOTSTRAP_CPM_VERSION )
         set ( GET_CPM_URL "https://github.com/cpm-cmake/CPM.cmake/releases/download/${BOOTSTRAP_CPM_VERSION}/get_cpm.cmake" )
     endif ()
