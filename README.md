@@ -1,9 +1,6 @@
 # cpp-init
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![C++](https://img.shields.io/badge/C%2B%2B-23-blue.svg)
-![CMake](https://img.shields.io/badge/CMake-3.26%2B-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
 
 **cpp-init** is a opinionated C++ project initialization toolkit that streamlines the setup and development of modern C++ projects. It provides:
 
@@ -12,6 +9,12 @@
 - 🔧 **Development Tools**: Pre-configured `.clang-format` and `.clang-tidy` for consistent code style
 - 📚 **Dependency Management**: Integration with CPM (CMake Package Manager) for easy library inclusion
 - 🏷️ **Version Management**: Automatic semantic versioning from Git tags
+
+# Policy on AI usage
+
+I generated initial documentation for this repo via LLM in the early days of AI and I am not touching it unless something get incorrect. Any future AI contributions are not allowed.
+
+**If you want to be extra safe**: Strip comments from `cpp-init.cmake` in your repo.
 
 ## Table of Contents
 
@@ -272,17 +275,6 @@ This section describes utility functions and macros present in the `cpp-init.cma
 
 ### Core Initialization Functions
 
-#### `cpp_init()`
-
-**Description**: Initializes cpp-init by bootstrapping CPM package manager and setting C++23/x64 configuration.  
-**Type**: Macro  
-**Arguments**: None  
-
-```cmake
-cpp_init()
-# Equivalent to calling bootstrap_cpm() and set_cpp23_x64()
-```
-
 #### `bootstrap_cpm([VERSION version])`
 
 **Description**: Downloads and includes the CPM.cmake package manager.  
@@ -296,17 +288,6 @@ bootstrap_cpm(VERSION "v0.34.0")   # Uses specific version
 
 # CPM is now available
 CPMAddPackage("gh:nlohmann/json@3.11.3")
-```
-
-#### `set_cpp23_x64()`
-
-**Description**: Configures project for C++23 standard with x64 platform.  
-**Type**: Macro  
-**Arguments**: None  
-
-```cmake
-set_cpp23_x64()
-# Sets CMAKE_GENERATOR_PLATFORM=x64, CMAKE_CXX_STANDARD=23
 ```
 
 ### File Discovery and Versioning
@@ -415,7 +396,7 @@ download_file_if_not_there(
 
 ### Development Tools
 
-#### `apply_compile_options(TARGET)`
+#### `apply_recommended_compile_options(TARGET)`
 
 **Description**: Applies recommended compiler flags and diagnostic settings.  
 **Type**: Function  
@@ -430,7 +411,7 @@ download_file_if_not_there(
 - Debug builds get `-d` postfix  
 
 ```cmake
-apply_compile_options(mytarget)
+apply_recommended_compile_options(mytarget)
 ```
 
 #### `enable_autoformatter(TARGET)`
@@ -482,7 +463,7 @@ enable_linter(mytarget)
 - ✅ Creates static library target  
 - ✅ Links public include directory (`include/` → PUBLIC)  
 - ✅ Links private include directory (`private_include/` → PRIVATE)  
-- ✅ Applies compiler options (`apply_compile_options`)  
+- ✅ Applies compiler options (`apply_recommended_compile_options`)  
 - ✅ Enables autoformatting (`enable_autoformatter`)  
 - ✅ Links dependencies (if specified)  
 - ✅ Enables linting (if `ENABLE_LINTER` specified)  
@@ -524,47 +505,7 @@ make_executable(MyApp
 **Description**: Links `private_include/` directory as PRIVATE if it exists.  
 **Type**: Macro
 
-## CMake Package Manager
-
-CPM is great, but I can never remember the author nor the CMake target I can link against. Here's a list of bunch of libraries I frequently use, might be useful for you as well:
-
-| Library name | Version | CPM expression | Linkable target |
-| --- | --- | --- | --- |
-| base64 | master | `gh:tobiaslocker/base64#master` | base64 |
-| Catch2 | 3.7.1 | `gh:catchorg/Catch2#v3.7.1` | Catch2::Catch2 |
-| cxxopts | 3.2.1 | `jarro2783/cxxopts#3.2.1` | cxxopts |
-| dgm-lib | 2.5.0 | `gh:nerudaj/dgm-lib#v2.5.0` | dgm-lib |
-| dgm-lib 3 | 3.0.0-rc1 | `gh:nerudaj/dgm-lib#v3.0.0-rc1` | dgm::dgm |
-| Eigen | master | `gl:libeigen/eigen#master` | Eigen3::Eigen |
-| EnTT | 3.14.0 | `gh:skypjack/entt#v3.14.0` | EnTT::EnTT |
-| FakeIt | 2.4.1 | `gh:eranpeer/FakeIt#2.4.1` | FakeIt::FakeIt |
-| fsm-lib | 2.1.0 | `gh:nerudaj/fsm-lib#v2.1.0` | fsm-lib |
-| nlohmann json | 3.11.3 | `gh:nlohmann/json#v3.11.3` | nlohmann::json |
-| SFML | 2.6.1 | `gh:SFML/SFML#2.6.1` | sfml-main sfml-audio sfml-graphics sfml-window sfml-network |
-| SFML 3 | 3.0.0 | `gh:SFML/SFML#3.0.0` | SFML::Main SFML::Audio SFML::Graphics SFML::Window SFML::Network |
-
 ## Contributing
-
-Contributions are welcome! Here's how you can help:
-
-### Reporting Issues
-- Use the [GitHub issue tracker](https://github.com/nerudaj/cpp-init/issues) 
-- Include your system information (Windows version, CMake version, etc.)
-- Provide a minimal reproduction case
-
-### Contributing Code
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Test** your changes with the integration test  
-4. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-5. **Push** to the branch (`git push origin feature/amazing-feature`)
-6. **Open** a Pull Request
-
-### Platform Support
-Currently optimized for **Windows/MSVC**. PRs welcome for:
-- 🐧 Linux/GCC support
-- 🍎 macOS/Clang support  
-- 🔧 Other build systems
 
 ### Testing Changes
 ```bash
@@ -582,9 +523,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **CPM.cmake**: Used for package management
 - **clang-format**: Code formatting
 - **clang-tidy**: Static analysis
-
----
-
-**Made with ❤️ for the C++ community**
-
-If cpp-init helped you kickstart your project, consider giving it a ⭐!
